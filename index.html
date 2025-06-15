@@ -54,6 +54,18 @@
       transform: scale(1.1);
     }
 
+    #loginButton {
+      background: #fff;
+      color: #c71585;
+      border: 2px solid #c71585;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
     section {
       padding: 60px 20px;
       max-width: 900px;
@@ -137,6 +149,7 @@
       <a href="#images">Images</a>
       <a href="#contact">Contact</a>
     </nav>
+    <button id="loginButton">Login</button>
   </header>
 
   <section id="about">
@@ -179,21 +192,25 @@
     const auth = firebase.auth();
     const allowedEmail = "admin@gmail.com";
     const uploadContainer = document.querySelector('.upload-container');
+    const loginButton = document.getElementById('loginButton');
     uploadContainer.style.display = "none";
 
-    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then((result) => {
-        const user = result.user;
-        if (user.email === allowedEmail) {
-          uploadContainer.style.display = "block";
-        } else {
-          alert("Akses hanya untuk admin.");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        alert("Gagal login.");
-      });
+    loginButton.addEventListener('click', () => {
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+        .then((result) => {
+          const user = result.user;
+          loginButton.innerText = `Hi, ${user.displayName}`;
+          if (user.email === allowedEmail) {
+            uploadContainer.style.display = "block";
+          } else {
+            alert("Akses hanya untuk admin.");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("Gagal login.");
+        });
+    });
 
     function addImage() {
       const input = document.getElementById('imageInput');
