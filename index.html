@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syid's Romantic Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #fff0f5, #ffe4e1);
+      color: #4b2e2e;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(45deg, #ff69b4, #ffb6c1);
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    header h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.5rem;
+      color: #fff;
+    }
+
+    nav {
+      margin-top: 15px;
+    }
+
+    nav a {
+      margin: 0 20px;
+      text-decoration: none;
+      color: #fff0f5;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    section {
+      padding: 60px 20px;
+      max-width: 900px;
+      margin: auto;
+      animation: fadeIn 1.5s ease;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #c71585;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .button {
+      display: inline-block;
+      background: #fff0f5;
+      color: #c71585;
+      border: 2px dashed #c71585;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #c71585;
+      color: #fff0f5;
+    }
+
+    .profile-pic {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 20px auto;
+      display: block;
+      border: 5px double #ff69b4;
+    }
+
+    .image-gallery img {
+      max-width: 100%;
+      margin: 15px 0;
+      border-radius: 15px;
+      border: 3px solid #ff69b4;
+      box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+    }
+
+    .upload-container {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .upload-button {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .upload-button input[type="file"] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Syid's Romantic Portfolio</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#images">Images</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="about">
+    <h2>About Me</h2>
+    <img src="https://via.placeholder.com/150" alt="Profile Picture" class="profile-pic">
+    <p style="text-align:center; max-width:700px; margin: 0 auto;">Saya adalah seorang pencinta desain dan pengkodean yang selalu menuangkan rasa dan estetika dalam setiap karya. Dengan sentuhan romantis, saya membangun website yang tak hanya fungsional tapi juga menyentuh hati.</p>
+  </section>
+
+  <section id="images">
+    <h2>My Sweet Memories</h2>
+    <div class="image-gallery" id="imageGallery"></div>
+    <div class="upload-container">
+      <label class="upload-button button">
+        💖 Tambah Kenangan
+        <input type="file" id="imageInput" accept="image/*" onchange="addImage()">
+      </label>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Me</h2>
+    <p style="text-align:center;">Email: syid@email.com<br>
+    WhatsApp: 0813-xxxx-xxxx<br>
+    Instagram: @syid_romantic</p>
+  </section>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAnWLJNWL8WvANw98mm7oyz8qeNxohs88c",
+      authDomain: "syid-romantic-portfolio.firebaseapp.com",
+      projectId: "syid-romantic-portfolio",
+      storageBucket: "syid-romantic-portfolio.firebasestorage.app",
+      messagingSenderId: "365923236930",
+      appId: "1:365923236930:web:a039c871e3fcc8a97a81db",
+      measurementId: "G-N69X72MT99"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const allowedEmail = "admin@gmail.com";
+    const uploadContainer = document.querySelector('.upload-container');
+    uploadContainer.style.display = "none";
+
+    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .then((result) => {
+        const user = result.user;
+        if (user.email === allowedEmail) {
+          uploadContainer.style.display = "block";
+        } else {
+          alert("Akses hanya untuk admin.");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Gagal login.");
+      });
+
+    function addImage() {
+      const input = document.getElementById('imageInput');
+      const gallery = document.getElementById('imageGallery');
+      const file = input.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          gallery.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+</body>
+
+</html>
